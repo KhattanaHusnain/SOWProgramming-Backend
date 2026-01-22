@@ -1,0 +1,11 @@
+package com.user.management.repository;
+
+import com.user.management.entity.Quiz;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface QuizRepository extends JpaRepository<Quiz, Long> {
+
+    List<Quiz> findByCourseId(Long courseId);
+}
