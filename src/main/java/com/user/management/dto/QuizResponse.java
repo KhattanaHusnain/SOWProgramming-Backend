@@ -10,7 +10,6 @@ public record QuizResponse(
         Integer passingMarks,
         Integer timeLimitMinutes,
 
-        Long courseId,
+        Long courseId
 
-        List<QuestionResponse> questions
 ) {}
