@@ -15,7 +15,7 @@
     </parent>
 
     <groupId>com.user</groupId>
-    <artifactId>management</artifactId>
+    <artifactId>SOWProgramming</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>User Management</name>
     <description>User Management Application</description>
@@ -44,11 +44,11 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-<!--        &lt;!&ndash; Security &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-security</artifactId>-->
-<!--        </dependency>-->
+        <!-- Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
         <!-- Swagger -->
         <dependency>

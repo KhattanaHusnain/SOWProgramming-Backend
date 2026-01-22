@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,9 @@ public class UserService {
             LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
+
+    /* ------------------ Register ------------------ */
 
     public User register(RegisterRequest request) {
 
@@ -40,7 +44,7 @@ public class UserService {
         User user = User.builder()
                 .username(request.username())
                 .email(request.email())
-                .password(request.password())
+                .password(passwordEncoder.encode(request.password()))
                 .build();
 
         User saved = repository.save(user);
@@ -48,6 +52,8 @@ public class UserService {
         log.info("User registered successfully with id: {}", saved.getId());
         return saved;
     }
+
+    /* ------------------ Login ------------------ */
 
     public User login(LoginRequest request) {
 
@@ -57,7 +63,7 @@ public class UserService {
                     return new AuthenticationException("Invalid credentials");
                 });
 
-        if (!request.password().equals(user.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             log.warn("Login failed: wrong password for {}", request.email());
             throw new AuthenticationException("Invalid credentials");
         }
@@ -66,23 +72,34 @@ public class UserService {
         return user;
     }
 
+    /* ------------------ Get All Users ------------------ */
+
     public List<User> getAllUsers() {
+        log.debug("Fetching all users");
         return repository.findAll();
     }
+
+    /* ------------------ Update User ------------------ */
 
     public User updateUser(Long id, UpdateUserRequest request) {
 
         User user = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));
 
-        if (repository.existsByUsername(request.username())) {
+        if (
+                repository.existsByUsername(request.username())
+                        && !user.getUsername().equals(request.username())
+        ) {
             throw new ConflictException("Username already in use");
         }
 
         user.setUsername(request.username());
 
+        log.info("User updated successfully with id: {}", id);
         return repository.save(user);
     }
+
+    /* ------------------ Delete User ------------------ */
 
     @Transactional
     public void deleteUser(Long id) {

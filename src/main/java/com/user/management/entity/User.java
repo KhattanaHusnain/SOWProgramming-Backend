@@ -23,10 +23,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String username;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String email;
 
     @JsonIgnore
@@ -34,6 +34,8 @@ public class User {
     private String password;
 
     @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToOne(
             mappedBy = "user",
             cascade = CascadeType.ALL,
@@ -41,4 +43,12 @@ public class User {
             fetch = FetchType.LAZY
     )
     private Profile profile;
+
+    /* Optional helper */
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+        if (profile != null) {
+            profile.setUser(this);
+        }
+    }
 }

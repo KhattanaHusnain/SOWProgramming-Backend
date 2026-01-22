@@ -3,6 +3,8 @@ package com.user.management.service;
 import com.user.management.dto.ProfileRequest;
 import com.user.management.dto.ProfileResponse;
 import com.user.management.entity.Profile;
+import com.user.management.entity.Role;
+import com.user.management.entity.SkillLevel;
 import com.user.management.entity.User;
 import com.user.management.exception.ConflictException;
 import com.user.management.exception.ResourceNotFoundException;
@@ -24,6 +26,8 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
 
+    /* ------------------ Create Profile ------------------ */
+
     public ProfileResponse createProfile(Long userId, ProfileRequest request) {
 
         log.debug("Creating profile for userId: {}", userId);
@@ -43,6 +47,22 @@ public class ProfileService {
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .phone(request.phone())
+                .bio(request.bio())
+                .profileImage(request.profileImage())
+                .role(Role.valueOf(request.role()))
+                .skillLevel(
+                        request.skillLevel() != null
+                                ? SkillLevel.valueOf(request.skillLevel())
+                                : null
+                )
+                .interests(request.interests())
+                .githubUrl(request.githubUrl())
+                .linkedinUrl(request.linkedinUrl())
+                .websiteUrl(request.websiteUrl())
+                .preferredLanguage(request.preferredLanguage())
+                .timezone(request.timezone())
+                .totalCoursesEnrolled(0)
+                .totalCoursesCompleted(0)
                 .user(user)
                 .build();
 
@@ -53,6 +73,8 @@ public class ProfileService {
         return toResponse(saved);
     }
 
+    /* ------------------ Get Profile ------------------ */
+
     public ProfileResponse getProfile(Long userId) {
 
         Profile profile = profileRepository.findById(userId)
@@ -60,6 +82,8 @@ public class ProfileService {
 
         return toResponse(profile);
     }
+
+    /* ------------------ Update Profile ------------------ */
 
     @Transactional
     public ProfileResponse updateProfile(Long profileId, ProfileRequest request) {
@@ -70,11 +94,25 @@ public class ProfileService {
         profile.setFirstName(request.firstName());
         profile.setLastName(request.lastName());
         profile.setPhone(request.phone());
+        profile.setBio(request.bio());
+        profile.setProfileImage(request.profileImage());
+        profile.setInterests(request.interests());
+        profile.setGithubUrl(request.githubUrl());
+        profile.setLinkedinUrl(request.linkedinUrl());
+        profile.setWebsiteUrl(request.websiteUrl());
+        profile.setPreferredLanguage(request.preferredLanguage());
+        profile.setTimezone(request.timezone());
+
+        if (request.skillLevel() != null) {
+            profile.setSkillLevel(SkillLevel.valueOf(request.skillLevel()));
+        }
 
         log.info("Profile updated successfully for profileId {}", profileId);
 
         return toResponse(profile);
     }
+
+    /* ------------------ Delete Profile ------------------ */
 
     public void deleteProfile(Long profileId) {
 
@@ -87,17 +125,37 @@ public class ProfileService {
         log.info("Profile deleted successfully for profileId {}", profileId);
     }
 
+    /* ------------------ Mapper ------------------ */
+
     private ProfileResponse toResponse(Profile profile) {
+
         User user = profile.getUser();
 
         return new ProfileResponse(
                 profile.getId(),
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+
                 profile.getFirstName(),
                 profile.getLastName(),
                 profile.getPhone(),
-                user.getId(),
-                user.getUsername(),
-                user.getEmail()
+                profile.getProfileImage(),
+                profile.getBio(),
+
+                profile.getRole().name(),
+                profile.getSkillLevel() != null ? profile.getSkillLevel().name() : null,
+                profile.getInterests(),
+
+                profile.getTotalCoursesEnrolled(),
+                profile.getTotalCoursesCompleted(),
+
+                profile.getGithubUrl(),
+                profile.getLinkedinUrl(),
+                profile.getWebsiteUrl(),
+
+                profile.getPreferredLanguage(),
+                profile.getTimezone()
         );
     }
 }

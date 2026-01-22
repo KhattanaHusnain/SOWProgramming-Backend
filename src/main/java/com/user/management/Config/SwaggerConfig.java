@@ -36,11 +36,6 @@ import org.springframework.context.annotation.Configuration;
                         description = "Development Server",
                         url = "http://localhost:8081"
                 )
-        },
-        tags = {
-                @Tag(name = "ABC"),
-                @Tag(name = "User APIs"),
-                @Tag(name = "Alif Anaar")
         }
 )
 @SecurityScheme(
