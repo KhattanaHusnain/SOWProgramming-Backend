@@ -8,4 +8,5 @@ import java.util.List;
 public interface TopicRepository extends JpaRepository<Topic, Long> {
 
     List<Topic> findByModuleId(Long moduleId);
+    List<Topic> findByModuleIdOrderById(Long moduleId);
 }
