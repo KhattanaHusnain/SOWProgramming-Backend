@@ -44,6 +44,15 @@ public class ProfileController {
         return ResponseEntity.ok(service.updateProfile(profileId, request));
     }
 
+    @PatchMapping("/{profileId}")
+    public ResponseEntity<ProfileResponse> patchProfile(
+            @PathVariable Long profileId,
+            @RequestBody ProfileRequest request
+    ) {
+        return ResponseEntity.ok(service.patchProfile(profileId, request));
+    }
+
+
     @DeleteMapping("/{profileId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProfile(@PathVariable Long profileId) {

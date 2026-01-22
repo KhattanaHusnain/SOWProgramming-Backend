@@ -86,6 +86,53 @@ public class ProfileService {
     /* ------------------ Update Profile ------------------ */
 
     @Transactional
+    public ProfileResponse patchProfile(Long profileId, ProfileRequest request) {
+
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile", profileId));
+
+        if (request.firstName() != null)
+            profile.setFirstName(request.firstName());
+
+        if (request.lastName() != null)
+            profile.setLastName(request.lastName());
+
+        if (request.phone() != null)
+            profile.setPhone(request.phone());
+
+        if (request.profileImage() != null)
+            profile.setProfileImage(request.profileImage());
+
+        if (request.bio() != null)
+            profile.setBio(request.bio());
+
+        if (request.skillLevel() != null)
+            profile.setSkillLevel(SkillLevel.valueOf(request.skillLevel()));
+
+        if (request.interests() != null)
+            profile.setInterests(request.interests());
+
+        if (request.githubUrl() != null)
+            profile.setGithubUrl(request.githubUrl());
+
+        if (request.linkedinUrl() != null)
+            profile.setLinkedinUrl(request.linkedinUrl());
+
+        if (request.websiteUrl() != null)
+            profile.setWebsiteUrl(request.websiteUrl());
+
+        if (request.preferredLanguage() != null)
+            profile.setPreferredLanguage(request.preferredLanguage());
+
+        if (request.timezone() != null)
+            profile.setTimezone(request.timezone());
+
+        log.info("Profile partially updated for profileId {}", profileId);
+
+        return toResponse(profile);
+    }
+
+    @Transactional
     public ProfileResponse updateProfile(Long profileId, ProfileRequest request) {
 
         Profile profile = profileRepository.findById(profileId)
