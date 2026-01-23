@@ -8,5 +8,9 @@ public record EnrolledCourseRequest(
         Long userId,
 
         @NotNull
-        Long courseId
-) {}
+        Long courseId,
+
+        Double progressPercentage,
+        Boolean completed
+) {
+}

@@ -1,5 +1,7 @@
 package com.user.management.service;
 
+import com.user.management.dto.EnrolledCourseRequest;
+import com.user.management.dto.EnrolledCourseResponse;
 import com.user.management.entity.Course;
 import com.user.management.entity.EnrolledCourse;
 import com.user.management.entity.User;
@@ -22,7 +24,9 @@ public class EnrolledCourseService {
     private final UserRepository userRepo;
     private final CourseRepository courseRepo;
 
-    public EnrolledCourse enroll(Long userId, Long courseId) {
+    /* ---------------- CREATE ---------------- */
+
+    public EnrolledCourseResponse enroll(Long userId, Long courseId) {
 
         if (enrollmentRepo.existsByUserIdAndCourseId(userId, courseId)) {
             throw new IllegalArgumentException("User already enrolled");
@@ -42,10 +46,80 @@ public class EnrolledCourseService {
                 .completed(false)
                 .build();
 
-        return enrollmentRepo.save(enrollment);
+        return toResponse(enrollmentRepo.save(enrollment));
     }
 
-    public List<EnrolledCourse> getUserEnrollments(Long userId) {
-        return enrollmentRepo.findByUserId(userId);
+    /* ---------------- READ ---------------- */
+
+    public List<EnrolledCourseResponse> getUserEnrollments(Long userId) {
+        return enrollmentRepo.findByUserId(userId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public EnrolledCourseResponse getOne(Long enrollmentId) {
+        return enrollmentRepo.findById(enrollmentId)
+                .map(this::toResponse)
+                .orElseThrow(() -> new IllegalArgumentException("Enrollment not found"));
+    }
+
+    /* ---------------- UPDATE (PUT) ---------------- */
+
+    public EnrolledCourseResponse update(
+            Long enrollmentId,
+            EnrolledCourseRequest request
+    ) {
+        EnrolledCourse enrollment = enrollmentRepo.findById(enrollmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Enrollment not found"));
+
+        enrollment.setProgressPercentage(request.progressPercentage());
+        enrollment.setCompleted(request.completed());
+
+        return toResponse(enrollment);
+    }
+
+    /* ---------------- PARTIAL UPDATE (PATCH) ---------------- */
+
+    public EnrolledCourseResponse patch(
+            Long enrollmentId,
+            EnrolledCourseRequest request
+    ) {
+        EnrolledCourse enrollment = enrollmentRepo.findById(enrollmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Enrollment not found"));
+
+        if (request.progressPercentage() != null) {
+            enrollment.setProgressPercentage(request.progressPercentage());
+        }
+
+        if (request.completed() != null) {
+            enrollment.setCompleted(request.completed());
+        }
+
+        return toResponse(enrollment);
+    }
+
+    /* ---------------- DELETE ---------------- */
+
+    public void delete(Long enrollmentId) {
+        if (!enrollmentRepo.existsById(enrollmentId)) {
+            throw new IllegalArgumentException("Enrollment not found");
+        }
+        enrollmentRepo.deleteById(enrollmentId);
+    }
+
+    /* ---------------- MAPPER ---------------- */
+
+    private EnrolledCourseResponse toResponse(EnrolledCourse ec) {
+        return new EnrolledCourseResponse(
+                ec.getId(),
+                ec.getUser().getId(),
+                ec.getCourse().getId(),
+                ec.getCourse().getTitle(),
+                ec.getProgressPercentage(),
+                ec.getCompleted(),
+                ec.getEnrolledAt(),
+                ec.getCompletedAt()
+        );
     }
 }
